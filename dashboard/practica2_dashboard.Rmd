@@ -1,5 +1,5 @@
 ---
-title: "HR Movement dashboard"
+title: "Visualización de datos de Facebook"
 output: 
   flexdashboard::flex_dashboard:
     orientation: rows
@@ -36,7 +36,6 @@ library(ggraph)
 library(ggiraph)
 #devtools::install_github("dgrtwo/drlib")
 
-
 ```
 
 
@@ -54,16 +53,32 @@ data[data$page_id=="5863113009",]$page_name<-"laTimes"
 Dataset {data-icon="fa-table"}
 =============================
 
+Row
+--------------------------------------
+<div style="height:100px">
+
+### Código
+
+Todo el código del proyecto está disponible en https://github.com/Fiorellaps/PRA2_visualizacion
+
+</div>
+
+Row
+--------------------------------------
+
+<div style="height:350px">
+
+
 ### Descripción del dataset
 
-El conjunto de datos ha sido tomado de [data.world] (https://data.world/martinchek/2012-2016-facebook-posts) y pertenecen a un [artículo] (https://shift.newco.co/2016/11/09/What-I-Discovered-About-Trump-and-Clinton-From-Analyzing-4-Million-Facebook-Posts/) que analizó 4 millones de publicaciones de Facebook para observar que información había sobre Donald Trump y Hilary Clinton. 
+El conjunto de datos ha sido tomado de [data.world](https://data.world/martinchek/2012-2016-facebook-posts) y pertenecen a un [artículo](https://shift.newco.co/2016/11/09/What-I-Discovered-About-Trump-and-Clinton-From-Analyzing-4-Million-Facebook-Posts/) que analizó 4 millones de publicaciones de Facebook para observar que información había sobre Donald Trump y Hilary Clinton. 
 
 Por ello, el conjunto contiene publicaciones de Facebook escritos entre 2012 y 2016 por 15 de los principales medios de comunicación.
 
 Los datos se encuentran agrupados (en csv) por medio de comunicación, por lo que para este caso solo he escogido 5 de esos medios para reducir los costes que puede tener analizar un conjunto de datos tan grande.
 
 
-Por tanto, el dataset generado se trata de un conjunto de 154.173 filas, cada una de las cuales corresponde a una **publicación de Facebook** realizada por algunas de las siguientes páginas:
+Por tanto, el dataset generado se trata de un conjunto de 135.544 filas, cada una de las cuales corresponde a una **publicación de Facebook** realizada por algunas de las siguientes páginas:
 
 - **BBC** (id 228735667216): The British Broadcasting Corporation.
 
@@ -76,28 +91,51 @@ U.S.
 
 - **LA Times** (id 5863113009): Los Angeles Times: News from California, the nation and world.
 
+</div>
+
+Row
+--------------------------------------
+
+<div style="height:600px">
+
 ### Previsualización de los datos
 
 ```{r}
-head(data)
+knitr::kable(head(data, n=2))
 ```
+</div>
+
+Row
+--------------------------------------
+
+<div style="height:800px">
+
 ### Resumen de los campos
 
 ```{r}
-summary(data)
-
+knitr::kable(summary(data))
 ```
+</div>
 
-
-General {data-icon="fa-chart-line"}
+Estadística {data-icon="fa-chart-line"}
 =============================
+
+Row
+--------------------------------------
+<div style="height:100px">
+
+### Descripción
+
+En esta página se muestra **información general de los datos** y gráficas relacionadas con el número de publicaciones según el **tipo y la fecha de publicación**.
+
+</div>
 
 Row {data-width=150}
 --------------------------------------
 ### Número de Publicaciones
 ```{r}
 total_post <- nrow(data)
-
+total_post <- paste0(substr(total_post, 1,3), ".", substr(total_post, 4,6 ))
 valueBox(value = total_post,icon = "fa-facebook",caption = "Número de Publicaciones",color = "#C1FFC1")
 ```
 
@@ -111,6 +149,7 @@ valueBox(value = total_pages,icon = "fa-file",caption = "Número de páginas", c
 ### Número de likes
 ```{r}
 likes_total <- sum(data$likes_count)
+likes_total <- paste0(substr(likes_total, 1,3), ".", substr(likes_total, 4,6 ),".", substr(likes_total, 7,9 ) )
 
 valueBox(value = likes_total,icon = "fa-thumbs-up",caption = "Número de likes", color = "#FFEC8B")
 ```
@@ -121,21 +160,23 @@ Row {data-width=150}
 ### Número de enlaces
 
 ```{r}
-link_post <- length(data[data$post_type == "link",])
+link_post <- nrow(data[data$post_type == "link",])
+link_post <- paste0(substr(link_post, 1,3), ".", substr(link_post, 4,6 ))
 
 valueBox(value = link_post,icon = "fa-link",caption = "Número de enlaces",color = "#EEEEE0")
 ```
 
 ### Número de vídeos
 ```{r}
-video_post <- length(data[data$post_type == "video",])
+video_post <- nrow(data[data$post_type == "video",])
+video_post <- paste0(substr(video_post, 1,2), ".", substr(video_post, 3,5 ))
 
 valueBox(value = video_post,icon = "fa-video",caption = "Número de vídeos", color = "#BF3EFF")
 ```
 
 ### Número de canciones
 ```{r}
-music_post <- length(data[data$post_type == "music",])
+music_post <- nrow(data[data$post_type == "music",])
 
 valueBox(value = music_post,icon = "fa-music",caption = "Número de canciones", color = "#7FFFD4")
 ```
@@ -146,7 +187,7 @@ Row {data-width=150}
 ### Número de eventos
 
 ```{r}
-event_post <- length(data[data$post_type == "event",])
+event_post <- nrow(data[data$post_type == "event",])
 
 valueBox(value = event_post,icon = "fa-calendar",caption = "Número de eventos",color = "#FFA07A")
 ```
@@ -154,16 +195,17 @@ valueBox(value = event_post,icon = "fa-calendar",caption = "Número de eventos",
 
 ### Número de fotos
 ```{r}
-photo_post <- length(data[data$post_type == "photo",])
+photo_post <- nrow(data[data$post_type == "photo",])
+photo_post <- paste0(substr(photo_post, 1,2), ".", substr(photo_post, 3,5 ))
 
-valueBox(value = 22,icon = "fa-image",caption = "Número de fotos", color = "#FF3030")
+valueBox(value = photo_post,icon = "fa-image",caption = "Número de fotos", color = "#FF3030")
 ```
 
 ### Número de comentarios
 ```{r}
 comments_total <- sum(data$comments_count)
-
-valueBox(value = music_post,icon = "fa-comment",caption = "Número de comentarios", color = "#E0FFFF")
+comments_total <- paste0(substr(comments_total, 1,3), ".", substr(comments_total, 4,6 ),".", substr(comments_total, 7,9 ) )
+valueBox(value = comments_total,icon = "fa-comment",caption = "Número de comentarios", color = "#E0FFFF")
 ```
 
 
@@ -196,7 +238,6 @@ data_by_page_type <- data %>% dplyr::group_by(page_name, post_type) %>%
 # Small multiple
 plot <- ggplot(data_by_page_type, aes(fill=post_type, y=total, x=page_name)) + 
     geom_bar(position="stack", stat="identity") +
-    scale_fill_viridis(discrete = T) +
     xlab("Página") +
   ylab("Nº publicaciones")
 ggplotly(plot)
@@ -281,6 +322,16 @@ ggplotly(plot)
 
 Reacciones {data-icon="fa-comments"}
 ===
+
+Row
+--------------------------------------
+<div style="height:100px">
+
+### Descripción
+
+En esta página han calculado el total de reacciones por tipo y página para ver cuáles son los patrones de los usuarios hacia esas páginas.
+
+</div>
 
 Row 
 -----------------------------------------------------------------------
@@ -469,7 +520,7 @@ lessR::PieChart(x=names,
                 fill = "viridis", 
                 hole = 0.5, 
                 main = "BBC",
-                values_size=2,
+                values_size=2.2,
                 labels_cex=2,
                 main_cex=2)
 ```
@@ -487,7 +538,7 @@ lessR::PieChart(x=names,
                 fill = "viridis", 
                 hole = 0.5, 
                 main = "CNN",
-                values_size=2,
+                values_size=2.2,
                 labels_cex=2,
                 main_cex=2)
 ```
@@ -502,7 +553,7 @@ lessR::PieChart(x=names,
                 fill = "viridis", 
                 hole = 0.5, 
                 main = "BBC",
-                values_size=2,
+                values_size=2.2,
                 labels_cex=2,
                 main_cex=2)
 ```
@@ -524,7 +575,7 @@ lessR::PieChart(x=names,
                 fill = "viridis", 
                 hole = 0.5, 
                 main = "The Fox",
-                values_size=2,
+                values_size=2.2,
                 labels_cex=2,
                 main_cex=2)
 ```
@@ -542,7 +593,7 @@ lessR::PieChart(x=names,
                 fill = "viridis", 
                 hole = 0.5, 
                 main = "LA Times",
-                values_size=2,
+                values_size=2.2,
                 labels_cex=2,
                 main_cex=2)
 
@@ -551,6 +602,17 @@ lessR::PieChart(x=names,
 
 Análisis de textos y sentimientos {data-icon="fa-user"}
 ===
+
+Row
+--------------------------------------
+<div style="height:100px">
+
+### Descripción
+
+En esta página se ha realizado un **análisis del texto** de las publicaciones para comprender las **relaciones** entre las palabras y los **sentimientos** asociados.
+
+</div>
+
 
 Row {.tabset .tabset-fade}
 --------
@@ -573,7 +635,8 @@ get_bigram_filtered <- function(filter_word){
     unite("bigram", c(word1, word2), sep = " ") %>%
     dplyr::filter(!stringr::str_detect(tolower(bigram), "http")) %>%
     dplyr::filter(!stringr::str_detect(tolower(bigram), "bbc")) %>%
-    dplyr::filter(!stringr::str_detect(tolower(bigram), "fox"))
+    dplyr::filter(!stringr::str_detect(tolower(bigram), "fox")) %>%
+    dplyr::filter(!stringr::str_detect(tolower(bigram), "abc"))
 
   data_bigram <- by(data_bigram, data_bigram["page_name"], head, n=8)
   data_bigram <- Reduce(rbind, data_bigram)
@@ -756,7 +819,7 @@ Row
 
 <div style="height:800px">
 
-### Red de correlaciones para el filtro Basketball
+### Red de correlaciones para el filtro "trump"
 
 
 ```{r}
